@@ -1,0 +1,73 @@
+>>> from linked_list import LinkedList, EmptyList, ListNode
+>>> LinkedList.from_list([])
+EmptyList()
+>>> print(LinkedList.from_list([]))
+<>
+>>> LinkedList.from_list([2, 3])
+ListNode(2, ListNode(3, EmptyList()))
+>>> EmptyList().count_of(12)
+0
+>>> EmptyList().count_of(1)
+0
+>>> test_count = LinkedList.from_list([1,2,3,2])
+>>> test_count.count_of(2)
+2
+>>> test_count.count_of(0)
+0
+>>> test_count.index_of(1)
+0
+>>> test_count.index_of(3)
+2
+>>> test_count.index_of(12)
+Traceback (most recent call last):
+    ...
+ValueError: 12 is not in list
+>>> test_with_empty = LinkedList.from_list([1, 4, [], 5])
+>>> test_with_empty.index_of([])
+2
+>>> test_with_empty.index_of(5)
+3
+>>> print(test_count.replace(2, 'hello'))
+<1, hello, 3, hello>
+>>> print(test_with_empty.replace([], 'hello'))
+<1, 4, hello, 5>
+>>> print(test_count.without(3))
+<1, 2, 2>
+>>> print(test_count.without(12))
+Traceback (most recent call last):
+    ...
+ValueError: 12 is not in list
+>>> test_count.joined_with('!')
+'1!2!3!2'
+>>> print(test_count.reversed())
+<2, 3, 2, 1>
+>>> print(test_with_empty.reversed())
+<5, [], 4, 1>
+>>> test_sorted = LinkedList.from_list([1, 2, 4, 5])
+>>> test_sorted_with_repeat = LinkedList.from_list([1, 2, 2, 5])
+>>> print(test_sorted.insert(3))
+<1, 2, 3, 4, 5>
+>>> print(test_sorted_with_repeat.insert(2))
+<1, 2, 2, 2, 5>
+>>> print(test_sorted)
+<1, 2, 4, 5>
+>>> print(test_count.sorted())
+<1, 2, 2, 3>
+>>> len(test_count)
+4
+>>> len(EmptyList())
+0
+>>> EmptyList().joined_with(',')
+''
+>>> print(test_count.replace(2, 2))
+<1, 2, 3, 2>
+>>> print(test_count.merge_with(EmptyList()))
+<1, 2, 2, 3>
+>>> print(EmptyList().merge_with(EmptyList()))
+<>
+>>> nums3 = ListNode(2, ListNode(4, ListNode(6, EmptyList())))
+>>> nums1 = ListNode(5, EmptyList()) 
+>>> if 5 in nums3:
+...     print('cool')
+>>> print(nums3 + nums1)
+<2, 4, 6, 5>

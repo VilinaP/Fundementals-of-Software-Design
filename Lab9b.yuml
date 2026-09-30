@@ -1,0 +1,12 @@
+// Lab 9a 2 Widgets
+// Vilina Prenko
+// 30.10.2025 
+
+// {type:class}
+// {direction:leftToRight}
+
+[Widget]
+[Widget]^[Button]
+[Widget]^[Label]
+[Widget]^[Panel]
+[Widget]-<>[Panel]

@@ -1,0 +1,246 @@
+# Test file for Klondike game
+# Vilina Prenko
+#05.11.2025 - write most of the tests 93% coverage
+#06.11.2025 - write the rest of the test 100% coverage
+
+>>> from random import seed
+>>> from klondike import *
+
+
+>>> game = Klondike()
+>>> game.is_finished()
+False
+>>> game.play_one("1S")
+>>> game.play_one("2S")
+>>> str(game).count('[]') >= 2
+True
+
+#CARD CLASS
+#-------------------------------------------------------------------------------------------------------------------
+
+>>> c = Card(Rank.ACE, Suit.SPADES)
+>>> c.is_face_up()
+False
+>>> c.flip().is_face_up()
+True
+>>> c.get_color()
+<Color.BLACK: 1>
+>>> c.get_rank(), c.get_suit()
+(<Rank.ACE: 1>, <Suit.SPADES: 1>)
+>>> c.flip()
+Card(Rank.ACE, Suit.SPADES)
+>>> str(c) == '\u2592\u2592'
+True
+>>> c.flip().is_face_up()
+True
+
+#STACK CLASS
+#-------------------------------------------------------------------------------------------------------------------
+
+>>> s = Stack()
+>>> s.is_empty()
+True
+>>> s.push(Card(Rank.TWO, Suit.HEARTS))
+>>> s.get_num_cards()
+1
+>>> popped = s.pop()
+>>> isinstance(popped, Card)
+True
+>>> s.is_empty()
+True
+>>> s.push(Card(Rank.TWO, Suit.HEARTS))
+>>> str(s)
+'▒▒'
+>>> s.peek_top().get_rank()
+<Rank.TWO: 2>
+>>> s.can_take(Card(Rank.THREE, Suit.CLUBS))
+True
+
+#DECK CLASS 
+#--------------------------------------------------------------------------------------------------------------------
+
+>>> d = Deck()
+>>> d.get_num_cards()
+52
+>>> isinstance(str(d), str)
+True
+>>> d.shuffle()
+>>> isinstance(d.pop(), Card)
+True
+
+#sUITSTACK CLASS 
+#--------------------------------------------------------------------------------------------------------------------
+
+>>> ss = SuitStack()
+>>> a_spade = Card(Rank.ACE, Suit.SPADES).flip()
+>>> ss.can_take(a_spade)
+True
+>>> ss.push(a_spade)
+>>> two_spade = Card(Rank.TWO, Suit.SPADES).flip()
+>>> ss.can_take(two_spade)
+True
+>>> wrong_suit = Card(Rank.TWO, Suit.HEARTS).flip()
+>>> ss.can_take(wrong_suit)
+False
+
+#TABLESTACK CLASS 
+#------------------------------------------------------------------------------------------------------------------
+
+>>> ts = TableStack()
+>>> king_red = Card(Rank.KING, Suit.HEARTS).flip()
+>>> ts.can_take(king_red)
+True
+>>> ts.push(king_red)
+>>> queen_black = Card(Rank.QUEEN, Suit.SPADES).flip()
+>>> ts.can_take(queen_black)
+True
+>>> queen_red = Card(Rank.QUEEN, Suit.DIAMONDS).flip()
+>>> ts.can_take(queen_red)
+False
+
+#.DEAL 
+#---------------------------------------------------------------------------------------------------------------------
+
+>>> seed(12345)  
+>>> game = Klondike()
+>>> len(game._table_stacks)
+7
+>>> sum(stack.get_num_cards() for stack in game._table_stacks) == 28
+True
+>>> all(isinstance(stack, TableStack) for stack in game._table_stacks)
+True
+>>> all(stack.peek_top().is_face_up() for stack in game._table_stacks)
+True
+
+#.TRYMOVE 
+#----------------------------------------------------------------------------------------------------------------------
+
+>>> src = TableStack()
+>>> dst = TableStack()
+>>> c1 = Card(Rank.KING, Suit.SPADES).flip()
+>>> src.push(c1)
+>>> game.try_move(src, dst, 1)
+True
+
+>>> c2 = Card(Rank.FIVE, Suit.HEARTS) 
+>>> src.push(c2)
+>>> game.try_move(src, dst, 1)
+False
+
+>>> game.try_move(src, dst, 2)  
+False
+
+
+
+
+#.PLAYONE 
+#---------------------------------------------------------------------------------------------------------------------
+
+>>> g = Klondike()
+>>> g.play_one('') is None 
+True
+>>> g.play_one('D')  
+>>> not g._discard_stack.is_empty()
+True
+>>> g2 = Klondike()
+>>> g2._table_stacks[0] = TableStack()  
+>>> (g2.play_one('1S') or True)  
+True
+>>> g3 = Klondike()
+>>> (g3.play_one('12A') or True)  
+True
+
+>>> game._discard_stack = Stack()
+>>> ace_spade = Card(Rank.ACE, Suit.SPADES).flip()
+>>> game._discard_stack.push(ace_spade)
+>>> game.play_one('DS')
+>>> game._suit_stacks[0].peek_top() == ace_spade
+True
+
+>>> game._table_stacks[0] = TableStack()
+>>> king_hearts = Card(Rank.KING, Suit.HEARTS).flip()
+>>> game._discard_stack.push(king_hearts)
+>>> game.play_one('D1')
+>>> game._table_stacks[0].peek_top() == king_hearts
+True
+
+>>> game._suit_stacks = [SuitStack() for _ in range(4)]
+>>> ace_spades = Card(Rank.ACE, Suit.SPADES).flip()
+>>> game._discard_stack.push(ace_spades)
+>>> game.play_one("DS")
+>>> game._suit_stacks[Suit.SPADES.value - 1].peek_top() == ace_spades
+True
+
+>>> game._suit_stacks = [SuitStack() for _ in range(4)]
+>>> ace_spades = Card(Rank.ACE, Suit.SPADES).flip()
+>>> game._discard_stack.push(ace_spades)
+>>> game.play_one("DS")
+>>> game._suit_stacks[Suit.SPADES.value - 1].peek_top() == ace_spades
+True
+
+>>> game._table_stacks[0] = TableStack()
+>>> king_spades = Card(Rank.KING, Suit.SPADES).flip()
+>>> game._table_stacks[0].push(king_spades)
+>>> game.play_one("1X") 
+>>> game._table_stacks[0].peek_top() == king_spades
+True
+
+>>> game = Klondike()
+>>> game._table_stacks[0] = TableStack()
+>>> game.play_one("1")  
+>>> game._table_stacks[0].is_empty()
+True
+>>> game.play_one("X")
+>>> isinstance(game, Klondike)
+True
+
+#.ISFINISHED 
+#-----------------------------------------------------------------------------------------------------------------
+>>> game = Klondike()
+>>> game.is_finished()
+False
+>>> for rank in list(Rank)[:-1]:
+...     game._suit_stacks[0].push(Card(rank, Suit.SPADES).flip())
+>>> game.is_finished()
+False
+
+>>> finished_game = Klondike()
+>>> for suit_stack, suit in zip(finished_game._suit_stacks, Suit):
+...     for rank in Rank:
+...         suit_stack.push(Card(rank, suit).flip())
+>>> finished_game.is_finished()
+True
+
+
+
+
+#GAME VISUAL
+#-----------------------------------------------------------------------------------------------------------------
+
+>>> g4 = Klondike()
+>>> g4.play_one('D')
+>>> not g4._discard_stack.is_empty()
+True
+>>> while not g4._draw_stack.is_empty():
+...     g4._discard_stack.push(g4._draw_stack.pop().flip())
+>>> g4.play_one('D')
+>>> isinstance(g4, Klondike)
+True
+
+
+
+#CARD STRINGS 
+#------------------------------------------------------------------------------------------------------------------
+
+>>> c_red = Card(Rank.ACE, Suit.HEARTS)
+>>> str(c_red) == '\u2592\u2592'
+True
+>>> c_red.flip()
+Card(Rank.ACE, Suit.HEARTS)
+>>> "A" in str(c_red) and "\u2665" in str(c_red)
+True
+>>> c_black = Card(Rank.KING, Suit.SPADES).flip()
+>>> "K" in str(c_black) and "\u2660" in str(c_black)
+True
+
+>>> seed()

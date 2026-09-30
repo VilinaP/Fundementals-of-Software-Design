@@ -1,0 +1,18 @@
+// Warmup 9A Filesystem
+// Prof. O
+// 2024-10-31
+
+// {type:class}
+// {direction:topDown}
+// {generate:true} = will generate an svg file each time you save a file. 
+
+[FSO]-[note: File System Object]
+[FSO]^[File]
+[FSO]^[Folder]
+[FSO]-<>[Folder]
+[Folder]-[note: How many FSOs in a folder? Maybe list?]
+
+
+// All three boxes are classes, notes on the sides with ---
+// -<> agregation - passes a class
+// -++ (filled dimont) - not used in this class
